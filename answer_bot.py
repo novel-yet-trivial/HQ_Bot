@@ -27,7 +27,7 @@ import sys
 import wx
 from halo import Halo
 
-# for terminal colors 
+# for terminal colors
 class bcolors:
 	HEADER = '\033[95m'
 	OKBLUE = '\033[94m'
@@ -47,7 +47,7 @@ remove_words = []
 # negative words
 negative_words= []
 
-# GUI interface 
+# GUI interface
 def gui_interface():
 	app = wx.App()
 	frame = wx.Frame(None, -1, 'win.py')
@@ -59,11 +59,11 @@ def gui_interface():
 # load sample questions
 def load_json():
 	global remove_words, sample_questions, negative_words
-	remove_words = json.loads(open("Data/settings.json").read())["remove_words"]
-	negative_words = json.loads(open("Data/settings.json").read())["negative_words"]
-	sample_questions = json.loads(open("Data/questions.json").read())
+	remove_words = json.load(open("Data/settings.json", encoding='utf8'))["remove_words"]
+	negative_words = json.load(open("Data/settings.json", encoding='utf8'))["negative_words"]
+	sample_questions = json.load(open("Data/questions.json", encoding='utf8'))
 
-# take screenshot of question 
+# take screenshot of question
 def screen_grab(to_save):
 	# 31,228 485,620 co-ords of screenshot// left side of screen
 	im = Imagegrab.grab(bbox=(31,228,485,640))
@@ -82,7 +82,7 @@ def read_screen():
 	ap.add_argument("-p", "--preprocess", type=str, default="thresh", help="type of preprocessing to be done")
 	args = vars(ap.parse_args())
 
-	# load the image 
+	# load the image
 	image = cv2.imread(args["image"])
 	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
@@ -100,7 +100,7 @@ def read_screen():
 	text = pytesseract.image_to_string(Image.open(filename))
 	os.remove(filename)
 	os.remove(screenshot_file)
-	
+
 	# show the output images
 
 	'''cv2.imshow("Image", image)
@@ -125,15 +125,15 @@ def parse_question():
 	for line in lines :
 		if not flag :
 			question=question+" "+line
-		
+
 		if '?' in line :
 			flag=True
 			continue
-		
+
 		if flag :
 			if line != '' :
 				options.append(line)
-			
+
 	return question, options
 
 # simplify question and remove which,what....etc //question is string
@@ -146,7 +146,7 @@ def simplify_ques(question):
 	temp = ' '.join(cleanwords)
 	clean_question=""
 	#remove ?
-	for ch in temp: 
+	for ch in temp:
 		if ch!="?" or ch!="\"" or ch!="\'":
 			clean_question=clean_question+ch
 
@@ -182,13 +182,13 @@ def split_string(source):
 
 # normalize points // get rid of common appearances // "quote" wiki option + ques
 def normalize():
-	return None	
+	return None
 
 # take screen shot of screen every 2 seconds and check for question
 def check_screen():
 	return None
 
-# wait for certain milli seconds 
+# wait for certain milli seconds
 def wait(msec):
 	return None
 
@@ -212,7 +212,7 @@ def google_wiki(sim_ques, options, neg):
 	maxp=-sys.maxsize
 	words = split_string(sim_ques)
 	for o in options:
-		
+
 		o = o.lower()
 		original=o
 		o += ' wiki'
@@ -268,7 +268,7 @@ def get_points_live():
 	points = []
 	simq, neg = simplify_ques(question)
 	maxo=""
-	m=1 
+	m=1
 	if neg:
 		m=-1
 	points,maxo = google_wiki(simq, options, neg)
@@ -292,5 +292,5 @@ if __name__ == "__main__":
 			break
 		else:
 			print(bcolors.FAIL + "\nUnknown input" + bcolors.ENDC)
-	
+
 
